@@ -136,7 +136,7 @@ def index():
 
                 # Get AI response
                 response = client.chat.completions.create(
-                    model="deepseek-ai/deepseek-chat-v2",
+                    model="deepseek-ai/DeepSeek-V3",
                     temperature=0,
                     messages=[
                         {"role": "system", "content": "You are an AI assistant."}
