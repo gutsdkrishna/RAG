@@ -8,45 +8,336 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --bg-dark: #121212;
+        --bg-card: #1e1e1e;
+        --accent-color: #7e57c2;
+        --accent-color-light: #9575cd;
+        --text-light: #f0f0f0;
+        --text-secondary: #a0a0a0;
+        --input-bg: #2a2a2a;
+        --border-color: rgba(255, 255, 255, 0.1);
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --success-color: #4caf50;
+        --danger-color: #e53935;
+      }
+
       body {
-        font-family: sans-serif;
-        background-color: #f8f9fa;
+        font-family: "Inter", -apple-system, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-light);
+        line-height: 1.6;
+        min-height: 100vh;
       }
+
       .container {
-        padding: 20px;
+        max-width: 900px;
+        padding: 30px 20px;
       }
-      .response-box {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
+
+      h1,
+      h2 {
+        font-weight: 600;
+        letter-spacing: -0.5px;
       }
+
+      .card {
+        background-color: var(--bg-card);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 20px var(--shadow-color);
+        padding: 25px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px var(--shadow-color);
+      }
+
       .form-label {
-        font-weight: bold;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text-light);
       }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: none;
+      }
+
+      .btn-primary {
+        background-color: var(--accent-color);
+      }
+
+      .btn-primary:hover {
+        background-color: #9575cd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(126, 87, 194, 0.3);
+      }
+
+      .btn-danger {
+        background-color: var(--danger-color);
+      }
+
+      .btn-danger:hover {
+        background-color: #f44336;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .response-box {
+        background-color: var(--bg-card);
+        border-radius: 12px;
+        padding: 0;
+        box-shadow: 0 8px 20px var(--shadow-color);
+        margin-top: 30px;
+        overflow: hidden;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .response-header {
+        background-color: rgba(126, 87, 194, 0.1);
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .response-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+
+      .assistant-avatar {
+        width: 36px;
+        height: 36px;
+        background-color: var(--accent-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .response-content {
+        padding: 20px;
+      }
+
+      .assistant-message {
+        line-height: 1.7;
+        margin-bottom: 20px;
+      }
+
       .json-pre {
-        background-color: #f0f0f0;
-        padding: 10px;
-        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 16px;
+        border-radius: 8px;
         overflow-x: auto;
-      } /* Add horizontal scroll for long JSON */
-      .tree {
-        margin-top: 20px;
+        color: #c0c0c0;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
       }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .tree ul {
         padding-left: 20px;
         list-style: none;
       }
+
       .tree li::before {
-        content: "-";
+        content: "›";
+        color: var(--accent-color);
         position: relative;
         left: -5px;
       }
+
       .table-container {
         margin-top: 20px;
         overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      /* Dark mode overrides for Bootstrap */
+      .table {
+        color: var(--text-light);
+      }
+
+      .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Markdown styling */
+      .markdown h1,
+      .markdown h2,
+      .markdown h3,
+      .markdown h4 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--text-light);
+      }
+
+      .markdown h1 {
+        font-size: 1.8rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5rem;
+      }
+
+      .markdown h2 {
+        font-size: 1.5rem;
+      }
+
+      .markdown h3 {
+        font-size: 1.3rem;
+      }
+
+      .markdown p {
+        margin-bottom: 1rem;
+      }
+
+      .markdown ul,
+      .markdown ol {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+      }
+
+      .markdown li {
+        margin-bottom: 0.5rem;
+      }
+
+      .markdown strong {
+        font-weight: 600;
+        color: var(--accent-color-light);
+      }
+
+      .markdown em {
+        font-style: italic;
+        opacity: 0.9;
+      }
+
+      .markdown code {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        font-size: 0.9em;
+      }
+
+      .markdown blockquote {
+        border-left: 4px solid var(--accent-color);
+        padding-left: 1rem;
+        margin-left: 0;
+        margin-right: 0;
+        font-style: italic;
+        color: var(--text-secondary);
+      }
+
+      /* Loading animation */
+      .loading-container {
+        display: none;
+        margin: 30px auto;
+        text-align: center;
+      }
+
+      .loading-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin: 0 5px;
+        border-radius: 50%;
+        background-color: var(--accent-color);
+        animation: pulse 1.5s infinite ease-in-out;
+      }
+
+      .loading-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .loading-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(0.7);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Typewriter effect styling */
+      .typewriter-text {
+        display: inline-block;
+        overflow: hidden;
+        white-space: break-spaces;
+        border-right: 0px;
+        animation: blinkCursor 0.75s step-end infinite;
+      }
+
+      @keyframes blinkCursor {
+        from,
+        to {
+          border-right-color: transparent;
+        }
+        50% {
+          border-right-color: var(--accent-color);
+        }
+      }
+
+      /* Form control styling */
+      .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
+        border-radius: 8px;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+      }
+
+      .form-control:focus {
+        background-color: rgba(126, 87, 194, 0.1);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.25);
+        color: var(--text-light);
+      }
+
+      .form-control::placeholder {
+        color: var(--text-secondary);
       }
     </style>
   </head>
@@ -55,75 +346,116 @@
       <!-- Sign-in Form -->
       <div
         id="sign-in-form"
+        class="card animate__animated animate__fadeIn"
         style="display: {{ 'none' if user_authenticated else 'block' }};"
       >
-        <h1 class="mb-4">Sign In</h1>
+        <h1 class="mb-4 text-center">Sign In</h1>
         <form method="POST" action="/login">
           <div class="mb-3">
-            <label for="username" class="form-label">Username:</label>
+            <label for="username" class="form-label">
+              <i class="fas fa-user me-2"></i>Username
+            </label>
             <input
               type="text"
               class="form-control"
               id="username"
               name="username"
               required
+              placeholder="Enter your username"
             />
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label">Password:</label>
+            <label for="password" class="form-label">
+              <i class="fas fa-lock me-2"></i>Password
+            </label>
             <input
               type="password"
               class="form-control"
               id="password"
               name="password"
               required
+              placeholder="Enter your password"
             />
           </div>
-          <button type="submit" class="btn btn-primary">Sign In</button>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </button>
         </form>
       </div>
-
       <!-- Chat Interface -->
       <div
         id="chat-interface"
         style="display: {{ 'block' if user_authenticated else 'none' }};"
       >
-        <h1 class="mb-4">Nebius LLM Dashboard</h1>
-        <form method="POST">
-          <div class="mb-3">
-            <label for="user_message" class="form-label"
-              >Enter your message:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="user_message"
-              name="user_message"
-              value="{{ user_message }}"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-          <button type="button" class="btn btn-danger" onclick="clearHistory()">
-            Clear History
-          </button>
-        </form>
-
+        <h1 class="mb-4 text-center">
+          <i class="fas fa-robot me-2"></i>Nebius LLM Dashboard
+        </h1>
+        <div class="card">
+          <form method="POST" id="chat-form">
+            <div class="mb-3">
+              <label for="user_message" class="form-label">
+                <i class="fas fa-comment me-2"></i>Enter your message
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="user_message"
+                name="user_message"
+                value="{{ user_message }}"
+                placeholder="Ask me anything..."
+              />
+            </div>
+            <div class="button-group">
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i class="fas fa-paper-plane me-2"></i>Submit
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                onclick="clearHistory()"
+              >
+                <i class="fas fa-trash me-2"></i>Clear History
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- Loading animation -->
+        <div class="loading-container" id="loading-animation">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <p class="mt-2 text-secondary">Generating response...</p>
+        </div>
         {% if response %}
-        <div class="response-box">
-          <h2>Response:</h2>
-          {% if response.get('error') %}
-          <p class="text-danger">Error: {{ response.error }}</p>
-          {% else %}
-          <p><strong>Assistant Message:</strong> {{ response.content }}</p>
-          <p><strong>Full JSON Response:</strong></p>
-          <pre class="json-pre"><code>{{ response | tojson }}</code></pre>
-          {% endif %}
+        <div class="response-box" id="response-container">
+          <div class="response-header">
+            <div class="assistant-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <h2>Assistant Response</h2>
+          </div>
+          <div class="response-content">
+            {% if response.get('error') %}
+            <p class="text-danger">
+              <i class="fas fa-exclamation-circle me-2"></i>Error: {{
+              response.error }}
+            </p>
+            {% else %}
+            <div class="assistant-message markdown" id="markdown-content">
+              {{ response.content }}
+            </div>
+            <h5 class="mt-4 mb-2">
+              <i class="fas fa-code me-2"></i>Full JSON Response
+            </h5>
+            <pre
+              class="json-pre"
+            ><code id="json-response">{{ response | tojson }}</code></pre>
+            {% endif %}
+          </div>
         </div>
         {% endif %}
       </div>
-
-     
-
+    </div>
     <script>
       // Function to clear chat history
       function clearHistory() {
@@ -131,12 +463,201 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              alert("Chat history cleared!");
-              location.reload();
+              const toast = document.createElement("div");
+              toast.className = "position-fixed bottom-0 end-0 p-3";
+              toast.style.zIndex = "11";
+              toast.innerHTML = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header" style="background-color: var(--success-color); color: white;">
+                    <strong class="me-auto"><i class="fas fa-check-circle me-2"></i>Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" onclick="this.parentElement.parentElement.remove()"></button>
+                  </div>
+                  <div class="toast-body" style="background-color: var(--bg-card); color: var(--text-light);">
+                    Chat history cleared successfully!
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(toast);
+              setTimeout(() => {
+                toast.remove();
+                location.reload();
+              }, 1500);
             } else {
               alert("Failed to clear chat history.");
             }
           });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const markdownContent = document.getElementById("markdown-content");
+        const jsonResponse = document.getElementById("json-response");
+        const chatForm = document.getElementById("chat-form");
+        const loadingAnimation = document.getElementById("loading-animation");
+        const responseContainer = document.getElementById("response-container");
+        const submitBtn = document.getElementById("submit-btn");
+
+        // Apply markdown formatting if content exists
+        if (markdownContent && markdownContent.innerHTML.trim()) {
+          const rawContent = markdownContent.innerHTML;
+          const formattedContent = formatMarkdown(rawContent);
+          markdownContent.innerHTML = formattedContent;
+
+          // Apply typewriter effect
+          applyTypewriterEffect(markdownContent);
+        }
+
+        // Handle form submission to show loading animation
+        if (chatForm) {
+          chatForm.addEventListener("submit", function (e) {
+            if (
+              !responseContainer ||
+              (responseContainer && responseContainer.style.display === "none")
+            ) {
+              e.preventDefault();
+
+              // Show loading animation
+              loadingAnimation.style.display = "block";
+
+              // Disable submit button
+              submitBtn.disabled = true;
+
+              // Submit the form after a short delay
+              setTimeout(() => {
+                chatForm.submit();
+              }, 500);
+            }
+          });
+        }
+      });
+
+      // Format markdown content
+      function formatMarkdown(text) {
+        // First, escape any HTML that might be in the original text
+        text = text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+        // Process line by line to handle headers correctly
+        let lines = text.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          // Check for headers (only at the beginning of lines)
+          if (lines[i].trim().startsWith("# ")) {
+            lines[i] = "<h1>" + lines[i].trim().substring(2) + "</h1>";
+          } else if (lines[i].trim().startsWith("## ")) {
+            lines[i] = "<h2>" + lines[i].trim().substring(3) + "</h2>";
+          } else if (lines[i].trim().startsWith("### ")) {
+            lines[i] = "<h3>" + lines[i].trim().substring(4) + "</h3>";
+          }
+        }
+        text = lines.join("\n");
+
+        // Bold text (but not headers)
+        text = text.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+
+        // Italic text
+        text = text.replace(/\*([^*\n]+?)\*/g, "<em>$1</em>");
+
+        // Numbered lists - process line by line for better control
+        lines = text.split("\n");
+        let inOrderedList = false;
+        let inUnorderedList = false;
+
+        for (let i = 0; i < lines.length; i++) {
+          // Numbered list items
+          const orderedMatch = lines[i].match(/^(\d+)\.\s+(.+)$/);
+          if (orderedMatch) {
+            if (!inOrderedList) {
+              lines[i] = "<ol><li>" + orderedMatch[2] + "</li>";
+              inOrderedList = true;
+            } else {
+              lines[i] = "<li>" + orderedMatch[2] + "</li>";
+            }
+          }
+          // Bullet list items
+          else if (lines[i].match(/^-\s+(.+)$/)) {
+            const content = lines[i].replace(/^-\s+/, "");
+            if (!inUnorderedList) {
+              lines[i] = "<ul><li>" + content + "</li>";
+              inUnorderedList = true;
+            } else {
+              lines[i] = "<li>" + content + "</li>";
+            }
+          }
+          // Close lists if next line is not a list item
+          else {
+            if (inOrderedList) {
+              lines[i - 1] += "</ol>";
+              inOrderedList = false;
+            }
+            if (inUnorderedList) {
+              lines[i - 1] += "</ul>";
+              inUnorderedList = false;
+            }
+          }
+        }
+
+        // Close any open lists at the end
+        if (inOrderedList) {
+          lines[lines.length - 1] += "</ol>";
+        }
+        if (inUnorderedList) {
+          lines[lines.length - 1] += "</ul>";
+        }
+
+        text = lines.join("\n");
+
+        // Code
+        text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+        // Convert newlines to <br> (after list processing)
+        text = text.replace(/\n/g, "<br>");
+
+        return text;
+      }
+
+      // Apply typewriter effect - modified to work better with HTML
+      function applyTypewriterEffect(element) {
+        const originalHTML = element.innerHTML;
+        element.innerHTML = "";
+        let textContainer = document.createElement("div");
+        textContainer.innerHTML = originalHTML;
+
+        // Extract just the text content for typing
+        const textContent = textContainer.textContent;
+        let charIndex = 0;
+        let htmlIndex = 0;
+        let currentHTML = "";
+
+        // Define a faster typing speed (in milliseconds)
+        const typingSpeed = 5; // lower value = faster typewriter effect
+
+        function typeNextChar() {
+          if (charIndex < textContent.length) {
+            // Skip HTML tags in the typing process
+            while (
+              htmlIndex < originalHTML.length &&
+              (originalHTML[htmlIndex] === "<" ||
+                currentHTML.lastIndexOf("<") > currentHTML.lastIndexOf(">"))
+            ) {
+              currentHTML += originalHTML[htmlIndex];
+              htmlIndex++;
+            }
+
+            if (htmlIndex < originalHTML.length) {
+              currentHTML += originalHTML[htmlIndex];
+              htmlIndex++;
+            }
+
+            element.innerHTML = currentHTML;
+            charIndex++;
+
+            setTimeout(typeNextChar, typingSpeed);
+          }
+        }
+
+        // Reduce the initial delay if desired
+        setTimeout(typeNextChar, 100);
       }
     </script>
     <script

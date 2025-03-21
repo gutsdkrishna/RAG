@@ -124,6 +124,7 @@ def index():
     response_data = None
     user_message = ""
 
+    
     if request.method == "POST":
         user_message = request.form.get("user_message")
         if user_message:
@@ -136,7 +137,7 @@ def index():
 
                 # Get AI response
                 response = client.chat.completions.create(
-                    model="meta-llama/Llama-3.2-3B-Instruct",
+                    model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF-fast",
                     temperature=0,
                     messages=[
                         {"role": "system", "content": "You are an AI assistant."}
@@ -199,4 +200,4 @@ def delete_message():
         return jsonify({"success": False, "error": str(e)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
