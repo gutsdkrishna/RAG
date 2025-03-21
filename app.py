@@ -28,8 +28,8 @@ def generate_embedding(text):
     )
     return response.data[0].embedding  # Extract vector from API response
 
-def retrieve_similar_messages(user_id, query_text, max_results=5):
-    """Retrieve most relevant past messages using vector similarity search."""
+def retrieve_similar_messages(user_id, query_text, max_results=5, similarity_threshold=0.7):
+    """Retrieve most relevant past messages using vector similarity search with threshold."""
     # Generate embedding for the query text
     query_embedding = generate_embedding(query_text)
 
@@ -41,15 +41,21 @@ def retrieve_similar_messages(user_id, query_text, max_results=5):
         vec1, vec2 = np.array(vec1), np.array(vec2)
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
-    # Rank messages by similarity in descending order
-    ranked_messages = sorted(
-        all_messages,
-        key=lambda msg: cosine_similarity(query_embedding, msg["embedding"]),
-        reverse=True
-    )
-
-    # Return top N messages with role and content
-    return [{"role": msg["role"], "content": msg["content"]} for msg in ranked_messages[:max_results]]
+    # Calculate similarity scores and filter by threshold
+    ranked_messages = []
+    for msg in all_messages:
+        similarity = cosine_similarity(query_embedding, msg["embedding"])
+        if similarity >= similarity_threshold:
+            ranked_messages.append((msg, similarity))
+    
+    # Sort by similarity in descending order
+    ranked_messages.sort(key=lambda x: x[1], reverse=True)
+    
+    # Return top N messages with role, content and similarity score
+    return [{"role": msg[0]["role"], 
+             "content": msg[0]["content"], 
+             "similarity": msg[1]} 
+            for msg in ranked_messages[:max_results]]
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -130,18 +136,42 @@ def index():
         if user_message:
             try:
                 # Retrieve similar past messages using embeddings
-                past_messages = retrieve_similar_messages(user_id, user_message)
-
-                # Add the latest user message
-                past_messages.append({"role": "user", "content": user_message})
+                retrieved_context = retrieve_similar_messages(user_id, user_message)
+                
+                # Format retrieved context as a separate context section
+                context_str = ""
+                if retrieved_context:
+                    context_str = "### Relevant Context:\n"
+                    for i, item in enumerate(retrieved_context):
+                        context_str += f"{i+1}. {item['role'].capitalize()}: {item['content']}\n"
+                
+                # Current conversation - just the new user query
+                current_message = {"role": "user", "content": user_message}
+                
+                # Create structured prompt with system message, context, and query
+                system_message = (
+                    "You are an AI assistant. Use the provided context to help answer "
+                    "the user's question. If the context doesn't contain relevant information, "
+                    "respond based on your general knowledge. Always cite which piece of context "
+                    "you used in your answer if applicable."
+                )
+                
+                messages = [
+                    {"role": "system", "content": system_message}
+                ]
+                
+                # Add context if available
+                if context_str:
+                    messages.append({"role": "system", "content": context_str})
+                    
+                # Add the current user query
+                messages.append(current_message)
 
                 # Get AI response
                 response = client.chat.completions.create(
                     model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF-fast",
                     temperature=0,
-                    messages=[
-                        {"role": "system", "content": "You are an AI assistant."}
-                    ] + past_messages
+                    messages=messages
                 )
 
                 ai_response = response.choices[0].message.content
