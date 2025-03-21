@@ -136,7 +136,7 @@ def index():
 
                 # Get AI response
                 response = client.chat.completions.create(
-                    model="deepseek-ai/DeepSeek-V3",
+                    model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF-fast",
                     temperature=0,
                     messages=[
                         {"role": "system", "content": "You are an AI assistant."}
