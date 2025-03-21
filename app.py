@@ -191,22 +191,73 @@ def index():
     return render_template("index.html", response=response_data, user_message=user_message, user_authenticated=True)
 
 @app.route("/admin", methods=["GET"])
-def admin_dashboard():
-    """Admin route to view all messages and embeddings."""
+def admin():
+    """Admin dashboard to view and manage chat history."""
     try:
-        # Fetch all messages from the database
-        all_messages = list(collection.find())
-
-        # Truncate embeddings for display
-        for message in all_messages:
-            if "embedding" in message:
-                message["embedding_preview"] = str(message["embedding"][:10]) + "..."  # Show first 10 values
-                message["embedding_full"] = message["embedding"]  # Store full embedding for "Show More"
-
-        # Render the admin dashboard with all messages
-        return render_template("admin.html", messages=all_messages)
+        # Fetch all messages from MongoDB
+        messages = list(collection.find({}))
+        
+        # Group messages by user_id for processing
+        user_messages = {}
+        assistant_messages = {}
+        
+        # First, separate messages by role and user_id
+        for msg in messages:
+            user_id = msg.get("user_id")
+            role = msg.get("role")
+            
+            if not user_id or not role:
+                continue
+                
+            if role == "user":
+                if user_id not in user_messages:
+                    user_messages[user_id] = []
+                user_messages[user_id].append(msg)
+            elif role == "assistant":
+                if user_id not in assistant_messages:
+                    assistant_messages[user_id] = []
+                assistant_messages[user_id].append(msg)
+        
+        # Format the data for the template
+        history = []
+        
+        # For each user, pair their messages with responses
+        for user_id, msgs in user_messages.items():
+            # Sort messages by _id to maintain chronological order
+            msgs.sort(key=lambda x: x["_id"])
+            
+            # Get assistant responses for this user
+            responses = assistant_messages.get(user_id, [])
+            responses.sort(key=lambda x: x["_id"])
+            
+            # Add each user message with its corresponding response
+            for i, msg in enumerate(msgs):
+                # Find the response that came after this message
+                response_content = "No response"
+                
+                # Try to find a response with an ID greater than the user message ID
+                for resp in responses:
+                    if resp["_id"] > msg["_id"]:
+                        response_content = resp.get("content", "No response")
+                        # Remove this response so we don't use it again
+                        responses.remove(resp)
+                        break
+                
+                history.append({
+                    "user_id": user_id,
+                    "role": msg.get("role"),
+                    "content": msg.get("content"),
+                    "response": response_content
+                })
+        
+        # Debug info
+        app.logger.info(f"Found {len(history)} entries for admin display")
+        
+        return render_template("admin.html", history=history)
     except Exception as e:
-        return jsonify({"error": str(e)})
+        # Log the error and return an error message
+        app.logger.error(f"Error in admin route: {str(e)}")
+        return render_template("admin.html", error=str(e))
 
 @app.route("/delete_message", methods=["POST"])
 def delete_message():
